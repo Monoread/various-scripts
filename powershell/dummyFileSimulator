@@ -1,0 +1,57 @@
+# Title: Dummy File Simulator
+# Created: 19/07/2024
+
+Add-Type -AssemblyName System.Windows.Forms
+
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "Test File"
+$form.Size = New-Object System.Drawing.Size(140,180)
+$form.StartPosition = "CenterScreen"
+
+$gbLabel = New-Object System.Windows.Forms.Label
+$gbLabel.Location = New-Object System.Drawing.Point(10,10)
+$gbLabel.Size = New-Object System.Drawing.Size(280,20)
+$gbLabel.Text = "Select GB = "
+$form.Controls.Add($gbLabel)
+
+$combo = New-Object System.Windows.Forms.ComboBox
+$combo.Location = New-Object System.Drawing.Point(10,30)
+$combo.Size = New-Object System.Drawing.Size(100,10)
+$combo.DropDownStyle = "DropDownList"
+for ($i = 0; $i -le 100; $i++) {
+    $combo.Items.Add($i.ToString() + " GB")
+}
+$form.Controls.Add($combo)
+
+$mbLabel = New-Object System.Windows.Forms.Label
+$mbLabel.Location = New-Object System.Drawing.Point(10,60)
+$mbLabel.Size = New-Object System.Drawing.Size(280,20)
+$mbLabel.Text = "Select MB = "
+$form.Controls.Add($mbLabel)
+
+$mCombo = New-Object System.Windows.Forms.ComboBox
+$mCombo.Location = New-Object System.Drawing.Point(10,80)
+$mCombo.Size = New-Object System.Drawing.Size(100,20)
+$mCombo.DropDownStyle = "DropDownList"
+for ($i = 0; $i -le 1000; $i += 100) {
+    $mCombo.Items.Add($i.ToString() + " MB")
+}
+$form.Controls.Add($mCombo)
+
+$genBtn = New-Object System.Windows.Forms.Button
+$genBtn.Location = New-Object System.Drawing.Point(10,110)
+$genBtn.Size = New-Object System.Drawing.Size(100,20)
+$genBtn.Text = "GO!"
+$genBtn.Add_Click({
+    $gbValue =[int]$combo.SelectedItem.ToString().Replace(" GB", "")
+    $mbValue =[int]$mCombo.SelectedItem.ToString().Replace(" MB", "")
+    $totalS = ($gbValue * 1GB + $mbValue * 1MB)
+    $F_Name = -join ((65..90) + (97..122) | Get-Random -Count 10 | % {[char]$_})
+    $F_Path = Join-Path -Path $PSScriptRoot -ChildPath $F_Name 
+    & fsutil.exe file createnew "$F_Path" $totalS
+    [System.Windows.Forms.MessageBox]::Show("Created: $F_Path")
+})
+$form.Controls.Add($genBtn)
+
+$form.Add_Shown({$form.Activate()})
+$form.ShowDialog()
