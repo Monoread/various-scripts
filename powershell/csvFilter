@@ -1,0 +1,33 @@
+# Title: Create filtered CSV
+# Created: 04/10/2025
+
+$inputCsv = "C:\Raw.csv"
+$outputCsv = "C:\Filtered.csv"
+
+$keepWords = @("OKAY", "valid")
+
+$data = Import-Csv -Path $inputCsv
+
+# only rows where keepWord is matched (case doesn't matter)
+$filteredData = $data | Where-Object {
+    $row = $_
+    $matchesFilter = $false
+
+    foreach ($property in $row.PSObject.Properties) {
+        $value = $property.Value -as [string]
+        if ($value) {
+            foreach ($word in $keepWords) {
+                if ($value -imatch [regex]::Escape($word)) {
+                    $matchesFilter = $true
+                    break
+                }
+            }
+        }
+        if ($matchesFilter) { break }
+    }
+    $matchesFilter
+}
+
+
+$filteredData | Export-Csv -Path $outputCsv -NoTypeInformation
+Write-Host "Filtered CSV w only matching rows saved to $outputCsv"
