@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Cineworld Film Stack Combo Estimator 
-// @namespace    local.cineworld.end-times
+// @name         Cineworld Est End Times & Stacker
+// @namespace    cineworld-est-times-stacker
 // @version      3.1.0
-// @description  Shows a start with adverts and finish time also spawns a small GUI bottom right that tries to find possible combos of films to do!
+// @description  Shows est start & finish times beside Cineworld showings and tries to work out logical stacks!
 // @match        https://www.cineworld.co.uk/*
 // @grant        none
 // @run-at       document-idle
@@ -11,30 +11,23 @@
 (() => {
   "use strict";
 
-  /* 
-    > Important dev notes started date 03/03/2026 - V 3.1.0 is 14/09/2026
-    - from my own calculations adverts it averages between 15 - 25 minutes
-    - films with higher "studio pressure" e.g. spiderman normally go right for 25 minutes regardless
-    - films after 10pm normally come down in weighting (more towards 15 minutes)
-    - I had to rapidly re-write and update this to respond to the new cineworld website 
-    - the style is done in factorio (i like factorio) it's also easy to condense making it ver nice
-  */
+  // CHANGE THESE IF YOU LIKE
   const ADVERT_MINUTES = 25;
-
   const COMMUTE_MINUTES = 30;
-  // css hook anchor finders
+
+  // SOME CSS ANCHORS
   const MOVIE_SELECTOR = ".cw-movie";
   const SHOWTIME_SELECTOR = 'a[href*="/order/showtimes/"][aria-label]';
   const OUTPUT_CLASS = "cw-estimated-times";
   const PLANNER_ID = "cw-combo-planner";
   const SEEN_FILMS_KEY = "cineworld-combo-seen-films";
 
+  // ALSO ADJUSTABLE
   const MIN_GAP = 5;
   const MAX_GAP = 40;
   const DEFAULT_GAP = 10;
   const DEFAULT_MAX_GAP = 40;
 
-  // not all places have recliner/superscreen delete as needed 
   const SPECIALITIES = [
     { key: "imax", label: "IMAX" },
     { key: "4dx", label: "4DX" },
@@ -613,11 +606,6 @@
     }
 
     ${P} .cw-premium-stack {
-      /* Gradient border trick: the visible "border" is actually the 2nd
-         background layer showing through a transparent border, clipped to
-         border-box. The 1st layer repaints the card fill just inside it,
-         clipped to padding-box. This keeps the rounded corners, which
-         border-image (the more obvious approach) cannot do. */
       border-color: transparent;
       background-image:
         linear-gradient(${T.card}, ${T.card}),
@@ -714,9 +702,6 @@
       font-size: 8px;
     }
 
-    /* .cw-format-3d sets a light background + dark text; without this rule
-       the darker background above (higher specificity, 2 classes vs 1) wins
-       here and leaves the dark text unreadable against it. */
     ${P} .cw-heading-badges .cw-format-3d {
       background: ${T.text};
       color: ${T.orangeText};
@@ -1178,8 +1163,7 @@
     return null;
   }
 
-  // Builds gradient across every film in the stack (defined earlier)
-  // just wanted a way to easy spot cool film stacks!
+  // build a nice fancy gradient for special formats
   function getStackBorderGradient(films) {
     const stops = films.map((film, index) => {
       const color = getFilmAccent(film.formats) || "transparent";
@@ -1211,6 +1195,7 @@
       ),
     );
 
+  // TODO: refactor a little
   function applySeenFilmState(seenFilms) {
     getMovies().forEach((movie) => {
       const name = getFilmName(movie);
@@ -1444,6 +1429,7 @@
       return html;
     };
 
+    // TODO: Needs to be more dyndynamic over "go up by px" but will sort
     const planner = document.createElement("aside");
     planner.id = PLANNER_ID;
     planner.innerHTML =
