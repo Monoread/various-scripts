@@ -1,9 +1,13 @@
 // ==UserScript==
 // @name         Cineworld Est End Times & Stacker
 // @namespace    cineworld-est-times-stacker
-// @version      3.1.0
+// @version      3.1.1
 // @description  Shows est start & finish times beside Cineworld showings and tries to work out logical stacks!
 // @match        https://www.cineworld.co.uk/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=cineworld.co.uk
+// @updateURL    https://raw.githubusercontent.com/Monoread/various-scripts/main/userscript/cineworld-est-times-stacker.user.js
+// @downloadURL  https://raw.githubusercontent.com/Monoread/various-scripts/main/userscript/cineworld-est-times-stacker.user.js
+// @license      MIT
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
